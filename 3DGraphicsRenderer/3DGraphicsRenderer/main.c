@@ -4,9 +4,13 @@
 #include <SDL.h>
 
 bool is_running = false;
+
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
+
 uint32_t* color_buffer = NULL;
+SDL_Texture* color_buffer_texture = NULL;
+
 int window_width = 800;
 int window_height = 600;
 
@@ -16,6 +20,13 @@ bool initialize_window(void){
         fprintf(stderr, "SDL could not initialize! SDL_Error: %s\n ", SDL_GetError());
         return false;
     }
+
+    /////// Use SDL to query what is the fullscreen max width and height
+
+    // SDL_DisplayMode display_mode;
+    // SDL_GetCurrentDisplayMode(0, &display_mode);
+    // window_width = display_mode.w;
+    // window_height = display_mode.h; 
 
     // Create a SDL window
     window = SDL_CreateWindow(
@@ -40,13 +51,26 @@ bool initialize_window(void){
          return false;
      }
 
+    /////  SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
+
     return true;
 
 }
 
+
+
 void setup(void){
-    // Initialize the color buffer
+    // Initialize the color buffer 
     color_buffer = (uint32_t*) malloc(sizeof(uint32_t) * window_width * window_height);
+
+    // Create a texture for the color buffer 
+    color_buffer_texture = SDL_CreateTexture(
+        renderer,
+        SDL_PIXELFORMAT_ARGB8888,
+        SDL_TEXTUREACCESS_STREAMING,
+        window_width,
+        window_height
+    );
 }
 
 void process_input(void){
@@ -69,9 +93,56 @@ void update(void){
     //todo
 }
 
+void render_color_buffer(void){
+    SDL_UpdateTexture(
+        color_buffer_texture,
+        NULL,
+        color_buffer,
+        (int)(window_width * sizeof(uint32_t))
+    );
+
+    SDL_RenderCopy(renderer, color_buffer_texture, NULL, NULL);
+
+}
+
+
+void clear_color_buffer(uint32_t color){
+    for (int y = 0; y < window_height; y++){
+        for (int x = 0; x < window_width; x++){
+            color_buffer[(window_width * y) + x] = color;
+        }
+    }
+}
+
+void draw_grid(void){
+    // Drawing a grid on the color buffer
+    for (int y = 0; y < window_height; y++){
+        for (int x = 0; x < window_width; x++){
+            if( y % 10 == 0 || x % 10 == 0 || y == window_height - 1 || x == window_width - 1){ 
+                color_buffer[(window_width * y) + x] = 0xFF0000FF;
+            }
+        }
+    } 
+}
+
+// Draw a rectangle on the color buffer
+void draw_rectangle(int x, int y, int width, int height, uint32_t color){
+    for (int i = y ; i < y + height; i++){
+        for (int j = x; j < x + width; j++){
+            color_buffer[(window_width * i) + j ] = color;
+        }
+    }
+}
+
+
 void render(void){
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
+    draw_grid();
+    draw_rectangle(300, 200, 300, 150, 0xFFFFFFFF);
+    render_color_buffer();
+    clear_color_buffer(0xFF000000);
+    
     SDL_RenderPresent(renderer);
     
 }
