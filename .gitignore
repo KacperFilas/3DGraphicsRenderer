@@ -1,0 +1,15 @@
+# Folder Visual Studio (ustawienia lokalne)
+.vs/
+
+# Foldery z wynikami budowania projektu
+Debug/
+Release/
+x64/
+x86/
+
+
+# Pliki binarne i obiekty (kompilacja)
+*.o
+*.obj
+*.exe
+*.out
