@@ -1,4 +1,0 @@
-﻿C:\Program Files\Microsoft Visual Studio\18\Community\MSBuild\Microsoft\VC\v180\Microsoft.CppBuild.targets(548,5): warning MSB8028: Katalog pośredni (Debug\) zawiera pliki udostępnione z innego projektu (Renderer.vcxproj). Może to spowodować niepoprawne zachowanie podczas oczyszczania i ponownej kompilacji.
-  main.c
-E:\ProgrammingProjects\3D Computer Graphics Programming\3DGraphicsRenderer\3DGraphicsRenderer\3DGraphicsRenderer\main.c(76,10): warning C4026: funkcja zadeklarowana z formalną listą parametrów
-  3DGraphicsRenderer.vcxproj -> E:\ProgrammingProjects\3D Computer Graphics Programming\3DGraphicsRenderer\3DGraphicsRenderer\Debug\3DGraphicsRenderer.exe
