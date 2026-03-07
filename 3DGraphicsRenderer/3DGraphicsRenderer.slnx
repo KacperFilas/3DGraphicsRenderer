@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="3DGraphicsRenderer/3DGraphicsRenderer.vcxproj" Id="3d6223b7-42ed-4c02-b13f-6cf1d3e09fd8" />
+</Solution>
