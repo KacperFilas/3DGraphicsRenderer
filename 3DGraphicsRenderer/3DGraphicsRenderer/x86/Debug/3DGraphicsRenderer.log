@@ -1,6 +1,0 @@
-﻿  main.c
-main.obj : error LNK2019: nierozpoznany symbol zewnętrzny SDL_Init przywołany w funkcji SDL_main
-MSVCRTD.lib(exe_main.obj) : error LNK2019: nierozpoznany symbol zewnętrzny main przywołany w funkcji "int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ)
-C:\SDL2\lib\x86\SDL2.lib : warning LNK4272: wystąpił konflikt typu maszyny biblioteki "x86" z typem maszyny docelowej "x64"
-C:\SDL2\lib\x86\SDL2main.lib : warning LNK4272: wystąpił konflikt typu maszyny biblioteki "x86" z typem maszyny docelowej "x64"
-E:\ProgrammingProjects\3D Computer Graphics Programming\3DGraphicsRenderer\3DGraphicsRenderer\x64\Debug\3DGraphicsRenderer.exe : fatal error LNK1120: liczba nierozpoznanych elementów zewnętrznych: 2
