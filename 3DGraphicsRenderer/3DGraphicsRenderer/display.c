@@ -84,6 +84,12 @@ void draw_grid(void){
     } 
 }
 
+void draw_pixel(int x, int y, uint32_t color){
+    if(x < window_width && y < window_height ){
+        color_buffer[(window_width * y) + x] = color;
+    }
+}
+
 // Draw a rectangle on the color buffer
 void draw_rectangle(int x, int y, int width, int height, uint32_t color){
     for (int i = y ; i < y + height; i++){
@@ -100,4 +106,6 @@ void destroy_window(void){
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
+
+
 
