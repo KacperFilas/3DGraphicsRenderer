@@ -67,6 +67,8 @@ void process_input(void){
 // Function that recieves a 3d vector and returns a projected 2d point
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+// Perspective projection 
 vec2_t project(vec3_t point){
     vec2_t projected_point = {
         .x = (fov_factor * point.x) / point.z,
@@ -97,7 +99,7 @@ void update(void){
 
         transformed_point.z -= camera_position.z;
 
-         // project the point to the screen
+         // project the point to the screen using perspective projection 
          vec2_t projected_point = project(transformed_point);
 
          // store the projected 2d point in the array of projected points
@@ -119,8 +121,8 @@ void render(void){
             projected_point.y + (window_height / 2),
             4, 
             4, 
-            0xFFFFFF00);
-    }
+            0xFF0000FF);
+    }   
 
 
     render_color_buffer();
