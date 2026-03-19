@@ -1,5 +1,6 @@
 # Folder Visual Studio (ustawienia lokalne)
 .vs/
+.vscode/
 
 # Foldery z wynikami budowania projektu
 Debug/

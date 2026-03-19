@@ -79,13 +79,10 @@ vec2_t project(vec3_t point){
 }
 
 
-
-
-
 void update(void){
         cube_rotation.x += 0.001;
-        cube_rotation.y += 0.001;
-        cube_rotation.z += 0.001;
+        cube_rotation.y += 0.000;
+        cube_rotation.z += 0.000;
     
     for (int i =0; i < N_POINTS; i++){
 
