@@ -66,7 +66,6 @@ vec2_t project(vec3_t point){
 
 
 void update(void){
-    // Wait until the next frame
 
     // get the time since the last frame
     int time_to_wait = FRAME_TARGET_TIME - (SDL_GetTicks() - previous_frame_time);
@@ -132,14 +131,22 @@ void render(void){
     for (int i = 0; i < N_MESH_FACES; i++){
 
         triangle_t triangle = triangles_to_render[i];
+
+        // draw the vertices
+
         draw_rectangle(triangle.points[0].x, triangle.points[0].y, 4, 4, 0xFF0000FF);
         draw_rectangle(triangle.points[1].x, triangle.points[1].y, 4, 4, 0xFF0000FF);
         draw_rectangle(triangle.points[2].x, triangle.points[2].y, 4, 4, 0xFF0000FF);
+
+        // draw the wireframe of the triangle
+        draw_triangle(
+            triangle.points[0].x, triangle.points[0].y, 
+            triangle.points[1].x, triangle.points[1].y, 
+            triangle.points[2].x, triangle.points[2].y, 
+            0xFF0000FF);
     }   
+
  
-
-
-
     render_color_buffer();
     clear_color_buffer(0xFF000000);
     SDL_RenderPresent(renderer);
