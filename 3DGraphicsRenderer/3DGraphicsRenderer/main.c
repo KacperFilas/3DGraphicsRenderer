@@ -75,6 +75,7 @@ void update(void){
     // get the time since the last frame
     int time_to_wait = FRAME_TARGET_TIME - (SDL_GetTicks() - previous_frame_time);
 
+
     // If the time to wait is between 0 and frame target time wait for the time to pass
     if(time_to_wait > 0 && time_to_wait <= FRAME_TARGET_TIME){
         SDL_Delay(time_to_wait);
@@ -87,8 +88,8 @@ void update(void){
     // Update the previous frame time
     previous_frame_time = SDL_GetTicks();
 
-    mesh.rotation.x += 0.0;
-    mesh.rotation.y += 0.01;
+    mesh.rotation.x += 0.01;
+    mesh.rotation.y += 0.0;
     mesh.rotation.z += 0.0;
 
     // Loop all traingle faces
@@ -180,6 +181,8 @@ void free_resources(void){
 int main(void){
 
     is_running = initialize_window();
+
+
 
     setup();
 

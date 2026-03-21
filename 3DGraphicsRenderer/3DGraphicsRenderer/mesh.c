@@ -58,42 +58,94 @@ void load_cube_mesh_data(void) {
     
 }
 
+// LOAD OBJ FILE DATA 
+
 void load_obj_file_data(char* filename){
     FILE* file = fopen(filename, "r");
     if (!file) return;
-    char line[256];
+    char line[1024];
+
 
     while(fgets(line, sizeof(line), file)){
+         // Store the vertices positions in the mesh data
         if(line[0] == 'v' && line[1] ==' '){
-            float v1, v2, v3;
+            float vertex_position[3];
             
             if(sscanf(
                 line, "v %f %f %f", 
-                &v1,
-                &v2,
-                &v3
+                &vertex_position[0], 
+                &vertex_position[1], 
+                &vertex_position[2]
+        
             ) == 3){
-                vec3_t vertexPosition = { .x = v1, .y = v2, .z = v3 };
+
+                vec3_t vertexPosition = { 
+                    .x = vertex_position[0], 
+                    .y = vertex_position[1], 
+                    .z = vertex_position[2] };
+
                 array_push(mesh.vertices, vertexPosition);
             }
         }
 
+        // store the faces order in the mesh data
         if(line[0] == 'f' && line[1] ==' '){
-            int v1, v2, v3, v4;
-            int count = sscanf(line, "f %d/%*d/%*d %d/%*d/%*d %d/%*d/%*d %d/%*d/%*d", &v1, &v2, &v3, &v4);
-                if( count == 4) {
-                    face_t tri1 = { v1, v2, v3 };
-                    face_t tri2 = { v1, v3, v4 };
-                    array_push(mesh.faces, tri1);
-                    array_push(mesh.faces, tri2);
+
+                int vertices[64], textures[64], normals[64];
+                int num_vertices = 0;
+
+                char* skip = line + 2;
+
+                char* token = strtok(skip, " ");
+
+                while (token != NULL){
+                    sscanf(token, "%d/%d/%d", 
+                        &vertices[num_vertices], 
+                        &textures[num_vertices], 
+                        &normals[num_vertices]);
+                    num_vertices++;
+                    token = strtok(NULL, " ");
                 }
-                else if(count == 3){
-                    face_t tri1 = { v1, v2, v3 };
-                    array_push(mesh.faces, tri1);
-            }
+
+                // traingle fan algorithm
+
+                for (int i = 1; i < num_vertices - 1; i++) {
+                    face_t triangle = {
+                            vertices[0],     
+                            vertices[i],     
+                            vertices[i + 1] 
+                    };
+
+                printf("triangle: %d %d %d\n", triangle.a, triangle.b, triangle.c);
+                array_push(mesh.faces, triangle);
+                }
         }
-
     }
-
-    fclose(file);
+  fclose(file);
 }
+
+
+                
+
+            // int vertex_index[4], texture_index[4], normal_index[4];
+
+            // int count = sscanf(line, "f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d", 
+            //     &vertex_index[0], &texture_index[0], &normal_index[0],
+            //     &vertex_index[1], &texture_index[1], &normal_index[1],
+            //     &vertex_index[2], &texture_index[2], &normal_index[2],
+            //     &vertex_index[3], &texture_index[3], &normal_index[3]
+            // );
+
+            // printf( "count: %d\n", count );
+            //     if( count == 12) {
+            //         face_t triangle_1 = { vertex_index[0], vertex_index[1], vertex_index[2] };
+            //         face_t triangle_2 = { vertex_index[2], vertex_index[3], vertex_index[0] };
+            //         array_push(mesh.faces, triangle_1);
+            //         array_push(mesh.faces, triangle_2);
+            //     }
+            //     else if(count == 9){
+            //         face_t triangle_1 = { vertex_index[0], vertex_index[1], vertex_index[2] };
+            //         array_push(mesh.faces, triangle_1);
+            // }
+        // }
+
