@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="array.c" />
     <ClCompile Include="display.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="mesh.c" />

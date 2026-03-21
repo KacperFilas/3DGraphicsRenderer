@@ -1,6 +1,16 @@
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>  
 #include "mesh.h"
+#include "array.h"
 
-vec3_t mesh_vertices[N_MESH_VERTICES] = {
+
+mesh_t mesh = {
+    .vertices = NULL,
+    .faces = NULL,
+    .rotation = {0,0,0}
+};
+
+vec3_t cube_vertices[N_CUBE_VERTICES] = {
     { .x = -1, .y = -1, .z = -1 }, // 1
     { .x = -1, .y =  1, .z = -1 }, // 2
     { .x =  1, .y =  1, .z = -1 }, // 3
@@ -11,7 +21,7 @@ vec3_t mesh_vertices[N_MESH_VERTICES] = {
     { .x = -1, .y = -1, .z =  1 }  // 8
 };
 
-face_t mesh_faces[N_MESH_FACES] = {
+face_t cube_faces[N_CUBE_FACES] = {
     // front
     { .a = 1, .b = 2, .c = 3 },
     { .a = 1, .b = 3, .c = 4 },
@@ -31,3 +41,59 @@ face_t mesh_faces[N_MESH_FACES] = {
     { .a = 6, .b = 8, .c = 1 },
     { .a = 6, .b = 1, .c = 4 }
 };
+
+void load_cube_mesh_data(void) {
+
+    for (int i=0; i < N_CUBE_VERTICES; i++){
+        vec3_t cube_vertex = cube_vertices[i];
+        array_push(mesh.vertices, cube_vertex);
+    }
+
+    for (int i = 0; i < N_CUBE_FACES; i++)
+    {
+        face_t cube_face = cube_faces[i];
+        array_push(mesh.faces, cube_face);
+
+    }
+    
+}
+
+void load_obj_file_data(char* filename){
+    FILE* file = fopen(filename, "r");
+    if (!file) return;
+    char line[256];
+
+    while(fgets(line, sizeof(line), file)){
+        if(line[0] == 'v' && line[1] ==' '){
+            float v1, v2, v3;
+            
+            if(sscanf(
+                line, "v %f %f %f", 
+                &v1,
+                &v2,
+                &v3
+            ) == 3){
+                vec3_t vertexPosition = { .x = v1, .y = v2, .z = v3 };
+                array_push(mesh.vertices, vertexPosition);
+            }
+        }
+
+        if(line[0] == 'f' && line[1] ==' '){
+            int v1, v2, v3, v4;
+            int count = sscanf(line, "f %d/%*d/%*d %d/%*d/%*d %d/%*d/%*d %d/%*d/%*d", &v1, &v2, &v3, &v4);
+                if( count == 4) {
+                    face_t tri1 = { v1, v2, v3 };
+                    face_t tri2 = { v1, v3, v4 };
+                    array_push(mesh.faces, tri1);
+                    array_push(mesh.faces, tri2);
+                }
+                else if(count == 3){
+                    face_t tri1 = { v1, v2, v3 };
+                    array_push(mesh.faces, tri1);
+            }
+        }
+
+    }
+
+    fclose(file);
+}
