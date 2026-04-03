@@ -59,7 +59,6 @@ void load_cube_mesh_data(void) {
 }
 
 // LOAD OBJ FILE DATA 
-
 void load_obj_file_data(char* filename){
     FILE* file = fopen(filename, "r");
     if (!file) return;
@@ -126,26 +125,3 @@ void load_obj_file_data(char* filename){
 
 
                 
-
-            // int vertex_index[4], texture_index[4], normal_index[4];
-
-            // int count = sscanf(line, "f %d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d", 
-            //     &vertex_index[0], &texture_index[0], &normal_index[0],
-            //     &vertex_index[1], &texture_index[1], &normal_index[1],
-            //     &vertex_index[2], &texture_index[2], &normal_index[2],
-            //     &vertex_index[3], &texture_index[3], &normal_index[3]
-            // );
-
-            // printf( "count: %d\n", count );
-            //     if( count == 12) {
-            //         face_t triangle_1 = { vertex_index[0], vertex_index[1], vertex_index[2] };
-            //         face_t triangle_2 = { vertex_index[2], vertex_index[3], vertex_index[0] };
-            //         array_push(mesh.faces, triangle_1);
-            //         array_push(mesh.faces, triangle_2);
-            //     }
-            //     else if(count == 9){
-            //         face_t triangle_1 = { vertex_index[0], vertex_index[1], vertex_index[2] };
-            //         array_push(mesh.faces, triangle_1);
-            // }
-        // }
-
