@@ -87,6 +87,17 @@ vec2_t project(vec3_t point){
 }
 
 
+// Helper function for the qsort in updated for depth sorting
+int compare_triangles(const void* a, const void* b) {
+    triangle_t* triangle_a = (triangle_t*)a;
+    triangle_t* triangle_b = (triangle_t*)b;
+
+    if (triangle_a->avg_depth < triangle_b->avg_depth) return -1;
+    if (triangle_a->avg_depth > triangle_b->avg_depth) return 1;
+    return 0;
+}
+
+
 void update(void){
 
     // get the time since the last frame
@@ -187,29 +198,40 @@ void update(void){
 
         } 
 
+        // Calculate the average depth for each face based on the vertices after transformation
+        float avg_depth = (transformed_vertices[0].z + transformed_vertices[1].z + transformed_vertices[2].z) / 3;
+
+
         triangle_t projected_triangle = {
             .points = { 
                 { projected_points[0].x, projected_points[0].y}, 
                 { projected_points[1].x, projected_points[1].y},
                 { projected_points[2].x, projected_points[2].y}
             },
-                .color = mesh.faces[i].color 
+                .color = mesh.faces[i].color,
+                .avg_depth = avg_depth
         };
 
          // save the projected triangle to the array of triangles to render
         array_push(triangles_to_render, projected_triangle);
+
+        int num_triangles = array_length(triangles_to_render);
+        if(num_triangles > 0){
+            qsort(triangles_to_render, num_triangles, sizeof(triangle_t), compare_triangles);
+        }
+
     }
 }
 
 
 void render(void){
 
+    // Clear the color buffer
+    SDL_RenderClear(renderer);
+    
     // Loop all projected points and draw a line between them
-
     int num_triangles = array_length(triangles_to_render);
-
     for (int i = 0; i < num_triangles; i++){
-
         triangle_t triangle = triangles_to_render[i];
 
 
