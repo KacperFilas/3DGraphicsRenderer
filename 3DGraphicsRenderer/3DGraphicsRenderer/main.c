@@ -6,6 +6,7 @@
 #include "array.h"
 #include "vector.h"
 #include "mesh.h"
+#include "matrix.h"
 
 // Array of triangles to render
 triangle_t* triangles_to_render = NULL;
@@ -79,10 +80,9 @@ void process_input(void){
 // Perspective projection 
 vec2_t project(vec3_t point){
     vec2_t projected_point = {
-        .x = (fov_factor * point.x) / point.z,
+        .x = (fov_factor * -point.x) / point.z,
         .y = (fov_factor * -point.y) / point.z,
     };
-    
     return projected_point;
 }
 
@@ -120,6 +120,20 @@ void update(void){
     mesh.rotation.y += 0.01;
     mesh.rotation.z += 0.01;
 
+    // mesh.scale.x += 0.002;
+    // mesh.scale.y += 0.001;
+
+    mesh.translation.x += 0.01;
+
+
+    // Create a scale matrix that will be used to scale the mesh vertices
+    matrix4_t scale_matrix = matrix4_make_scale(mesh.scale.x, mesh.scale.y, mesh.scale.z);
+    matrix4_t rotation_matrix_x = matrix4_make_rotation_x(mesh.rotation.x);
+    matrix4_t rotation_matrix_y = matrix4_make_rotation_y(mesh.rotation.y);
+    matrix4_t rotation_matrix_z = matrix4_make_rotation_z(mesh.rotation.z);
+    matrix4_t translation_matrix = matrix4_make_translation(mesh.translation.x, mesh.translation.y, mesh.translation.z);
+
+
     // Loop all traingle faces
     int num_faces = array_length(mesh.faces);
 
@@ -132,16 +146,25 @@ void update(void){
         face_vertices[1] = mesh.vertices[mesh_face.b - 1];
         face_vertices[2] = mesh.vertices[mesh_face.c - 1];
 
-        vec3_t transformed_vertices[3];
+        vec4_t transformed_vertices[3];
         
         // loop all three vertices of the triangle of this current face and apply transformations
         for(int j = 0; j < 3; j++){
    
-            vec3_t transformed_vertex = face_vertices[j];
+            vec4_t transformed_vertex = vec4_from_vec3(face_vertices[j]);
 
-            transformed_vertex = vec3_rotate_x(transformed_vertex, mesh.rotation.x);
-            transformed_vertex = vec3_rotate_y(transformed_vertex, mesh.rotation.y);
-            transformed_vertex = vec3_rotate_z(transformed_vertex, mesh.rotation.z);
+            // Create a world Matrix that will be used to transform the vertex
+            matrix4_t world_matrix = matrix4_identity();
+            // ORDER MATTERS HERE: Scale -> Rotation -> Translation
+            world_matrix = matrix4_mul_matrix4(scale_matrix, world_matrix);
+            world_matrix = matrix4_mul_matrix4(rotation_matrix_x, world_matrix);
+            world_matrix = matrix4_mul_matrix4(rotation_matrix_y, world_matrix);
+            world_matrix = matrix4_mul_matrix4(rotation_matrix_z, world_matrix);
+            world_matrix = matrix4_mul_matrix4(translation_matrix, world_matrix);
+
+            // Apply the world matrix to the vertex
+            transformed_vertex = matrix4_mul_vec4(world_matrix, transformed_vertex);
+
 
             // translate the vertex away from the camera
             transformed_vertex.z += -5;
@@ -155,9 +178,9 @@ void update(void){
         // BACK FACE CULLING
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(back_face_culling){
-            vec3_t vector_a = transformed_vertices[0]; /*    A    */
-            vec3_t vector_b = transformed_vertices[1]; /*  /   \  */
-            vec3_t vector_c = transformed_vertices[2]; /* C-----B */
+            vec3_t vector_a = vec3_from_vec4(transformed_vertices[0]); /*    A    */
+            vec3_t vector_b = vec3_from_vec4(transformed_vertices[1]); /*  /   \  */
+            vec3_t vector_c = vec3_from_vec4(transformed_vertices[2]); /* C-----B */
 
             // Get the vectors from A to B and A to C and normalize them
             vec3_t vector_ab = vec3_sub(vector_b, vector_a);
@@ -190,7 +213,7 @@ void update(void){
         for (int j = 0; j < 3; j++) {
 
             // project the current vertex to the screen
-            projected_points[j] = project(transformed_vertices[j]);
+            projected_points[j] = project(vec3_from_vec4(transformed_vertices[j]));
 
             // scale and translate the projected point to the center of the screen
             projected_points[j].x += (window_width / 2);
@@ -215,11 +238,15 @@ void update(void){
          // save the projected triangle to the array of triangles to render
         array_push(triangles_to_render, projected_triangle);
 
-        int num_triangles = array_length(triangles_to_render);
-        if(num_triangles > 0){
-            qsort(triangles_to_render, num_triangles, sizeof(triangle_t), compare_triangles);
-        }
+        
 
+
+    }
+
+    // Sort the triangles to render based on the average depth
+    int num_triangles = array_length(triangles_to_render);
+    if(num_triangles > 0){
+        qsort(triangles_to_render, num_triangles, sizeof(triangle_t), compare_triangles);
     }
 }
 
@@ -255,7 +282,7 @@ void render(void){
             );  
 
             for (int i = 0; i < 3; i++){
-                draw_rectangle(triangle.points[i].x - 3, triangle.points[i].y - 3 ,6 ,6 , 0xFFFF00000);
+                draw_rectangle(triangle.points[i].x - 3, triangle.points[i].y - 3 ,6 ,6 , 0xFFFF0000);
             }
         } 
     }

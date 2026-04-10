@@ -143,6 +143,7 @@
     <ClCompile Include="array.c" />
     <ClCompile Include="display.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="matrix.c" />
     <ClCompile Include="mesh.c" />
     <ClCompile Include="triangle.c" />
     <ClCompile Include="vector.c" />
