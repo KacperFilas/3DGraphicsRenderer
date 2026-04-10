@@ -104,7 +104,32 @@ matrix4_t matrix4_mul_matrix4(matrix4_t a, matrix4_t b){
     return result;
 }
 
+matrix4_t matrix4_make_perspective(float fov, float aspect, float znear, float zfar){
+     
 
+    matrix4_t m = {{{0}}};
+    m.m[0][0] = - ((1 / tan(fov / 2))/ aspect);
+    m.m[1][1] = 1 / tan(fov / 2);
+    m.m[2][2] = zfar / (zfar - znear);
+    m.m[2][3] = (-zfar * znear) / (zfar - znear);
+    m.m[3][2] = 1.0;
+
+    return m;
+}
+
+vec4_t matrix4_mul_vec4_project(matrix4_t mat_proj, vec4_t v){
+    // Multiply the vector by the projection matrix
+
+    vec4_t result = matrix4_mul_vec4(mat_proj, v);
+    // perform perspective division with original z value that is now in w
+    if(result.w != 0){
+        result.x /= result.w;
+        result.y /= result.w;
+        result.z /= result.w;
+    }
+    
+    return result; 
+}
     
 
 

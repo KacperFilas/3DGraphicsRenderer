@@ -15,5 +15,6 @@ matrix4_t matrix4_make_rotation_y(float angle);
 matrix4_t matrix4_make_rotation_z(float angle);
 vec4_t matrix4_mul_vec4(matrix4_t m, vec4_t v);
 matrix4_t matrix4_mul_matrix4(matrix4_t a, matrix4_t b);
-
+matrix4_t matrix4_make_perspective(float fov, float aspect, float znear, float zfar);
+vec4_t matrix4_mul_vec4_project(matrix4_t mat_proj, vec4_t v);
 #endif

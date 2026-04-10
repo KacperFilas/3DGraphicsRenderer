@@ -22,12 +22,10 @@ enum render_mode {
 
 enum render_mode current_render_mode = RENDER_FILLED_WIREFRAME;
 bool back_face_culling = true;
-     
-float fov_factor = 640;
-
 bool is_running = false;
-
 int previous_frame_time = 0;
+
+matrix4_t proj_matrix;
 
 
 void setup(void){
@@ -43,7 +41,13 @@ void setup(void){
         window_height
     );
 
-    // Load the cube values in the mesh data
+    // Initilize perspective matrix
+    float fov = M_PI / 3.0;  // The same as 60 degrees or 180 / 3
+    float aspect = (float)window_width / (float)window_height;
+    float znear = 0.1;
+    float zfar = 100.0;
+    proj_matrix = matrix4_make_perspective(fov, aspect, znear, zfar);
+
 
     // load_obj_file_data("./Cube.obj");
 
@@ -71,19 +75,6 @@ void process_input(void){
         }
         break;
     }
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Function that recieves a 3d vector and returns a projected 2d point
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Perspective projection 
-vec2_t project(vec3_t point){
-    vec2_t projected_point = {
-        .x = (fov_factor * -point.x) / point.z,
-        .y = (fov_factor * -point.y) / point.z,
-    };
-    return projected_point;
 }
 
 
@@ -117,13 +108,10 @@ void update(void){
     previous_frame_time = SDL_GetTicks();
 
     mesh.rotation.x += 0.01;
-    mesh.rotation.y += 0.01;
-    mesh.rotation.z += 0.01;
 
     // mesh.scale.x += 0.002;
     // mesh.scale.y += 0.001;
-
-    mesh.translation.x += 0.01;
+    // mesh.translation.z += 0.01;
 
 
     // Create a scale matrix that will be used to scale the mesh vertices
@@ -203,22 +191,26 @@ void update(void){
                 continue;
             }
         }
-      
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-        vec2_t projected_points[3];
+        vec4_t projected_points[3];
 
         // loop all three vertices of the triangle and perform the projection
         for (int j = 0; j < 3; j++) {
 
             // project the current vertex to the screen
-            projected_points[j] = project(vec3_from_vec4(transformed_vertices[j]));
+            projected_points[j] = matrix4_mul_vec4_project(proj_matrix, transformed_vertices[j]);
 
-            // scale and translate the projected point to the center of the screen
-            projected_points[j].x += (window_width / 2);
-            projected_points[j].y += (window_height / 2);
+            // scale the projected point to the size of the screen
+            projected_points[j].x *= (window_width / 2.0);
+            projected_points[j].y *= (window_height / 2.0);
 
+            // translate the projected point to the center of the screen
+            projected_points[j].x += (window_width / 2.0);
+            projected_points[j].y += (window_height / 2.0);
+
+          
         } 
 
         // Calculate the average depth for each face based on the vertices after transformation
