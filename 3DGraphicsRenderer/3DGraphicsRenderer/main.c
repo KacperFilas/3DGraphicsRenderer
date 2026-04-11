@@ -4,9 +4,11 @@
 #include <SDL.h>
 #include "display.h"
 #include "array.h"
+#include "light.h"
 #include "vector.h"
 #include "mesh.h"
 #include "matrix.h"
+
 
 // Array of triangles to render
 triangle_t* triangles_to_render = NULL;
@@ -50,8 +52,9 @@ void setup(void){
 
 
     // load_obj_file_data("./Cube.obj");
+    load_obj_file_data("./Something.obj");
 
-    load_cube_mesh_data();
+    // load_cube_mesh_data();
 
 }
 
@@ -101,17 +104,17 @@ void update(void){
     }
 
     // Initialize array of triangles to render
-
     triangles_to_render = NULL; 
 
     // Update the previous frame time
     previous_frame_time = SDL_GetTicks();
 
-    mesh.rotation.x += 0.01;
+    // mesh.rotation.x += 0.01;
+    // mesh.rotation.y += 0.01;
 
     // mesh.scale.x += 0.002;
     // mesh.scale.y += 0.001;
-    // mesh.translation.z += 0.01;
+    // mesh.translation.x += 0.01;
 
 
     // Create a scale matrix that will be used to scale the mesh vertices
@@ -165,7 +168,7 @@ void update(void){
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // BACK FACE CULLING
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(back_face_culling){
+       
             vec3_t vector_a = vec3_from_vec4(transformed_vertices[0]); /*    A    */
             vec3_t vector_b = vec3_from_vec4(transformed_vertices[1]); /*  /   \  */
             vec3_t vector_c = vec3_from_vec4(transformed_vertices[2]); /* C-----B */
@@ -182,16 +185,17 @@ void update(void){
 
             // Find the vector between a point in the triangle and the camera origin
             vec3_t camera_ray = vec3_sub(camera_position, vector_a);
-
             // Calculate how alligned the camera ray is with the traingle face normal (dot product)
-            float angle = vec3_dot(camera_ray, normal);
+            float angle = -vec3_dot(camera_ray, normal);
 
+        if(back_face_culling){
             // Bypass the triangles that are looking away from the camera
             if(angle < 0){
                 continue;
             }
         }
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
         vec4_t projected_points[3];
@@ -209,12 +213,16 @@ void update(void){
             // translate the projected point to the center of the screen
             projected_points[j].x += (window_width / 2.0);
             projected_points[j].y += (window_height / 2.0);
-
-          
         } 
 
         // Calculate the average depth for each face based on the vertices after transformation
         float avg_depth = (transformed_vertices[0].z + transformed_vertices[1].z + transformed_vertices[2].z) / 3;
+            
+        // Calculate the shade inesity based on how alligned the triangle is with the light source
+        float light_intensity = -vec3_dot(normal, main_light.direction);
+
+        // Calculate the traingle color based on the light angle
+        uint32_t triangle_color = light_apply_intensity(mesh_face.color, light_intensity);
 
 
         triangle_t projected_triangle = {
@@ -223,16 +231,12 @@ void update(void){
                 { projected_points[1].x, projected_points[1].y},
                 { projected_points[2].x, projected_points[2].y}
             },
-                .color = mesh.faces[i].color,
+                .color = triangle_color,
                 .avg_depth = avg_depth
         };
 
          // save the projected triangle to the array of triangles to render
         array_push(triangles_to_render, projected_triangle);
-
-        
-
-
     }
 
     // Sort the triangles to render based on the average depth
@@ -252,7 +256,6 @@ void render(void){
     int num_triangles = array_length(triangles_to_render);
     for (int i = 0; i < num_triangles; i++){
         triangle_t triangle = triangles_to_render[i];
-
 
         if (current_render_mode == RENDER_FILLED || current_render_mode == RENDER_FILLED_WIREFRAME){
 

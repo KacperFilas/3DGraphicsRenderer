@@ -142,6 +142,7 @@
   <ItemGroup>
     <ClCompile Include="array.c" />
     <ClCompile Include="display.c" />
+    <ClCompile Include="light.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="matrix.c" />
     <ClCompile Include="mesh.c" />
