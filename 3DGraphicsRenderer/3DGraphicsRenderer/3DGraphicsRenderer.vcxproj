@@ -146,6 +146,7 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="matrix.c" />
     <ClCompile Include="mesh.c" />
+    <ClCompile Include="texture.c" />
     <ClCompile Include="triangle.c" />
     <ClCompile Include="vector.c" />
   </ItemGroup>

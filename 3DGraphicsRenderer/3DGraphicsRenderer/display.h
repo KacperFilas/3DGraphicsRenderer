@@ -20,6 +20,17 @@ extern SDL_Texture* color_buffer_texture;
 extern int window_width;
 extern int window_height; 
 
+typedef enum {
+    RENDER_WIREFRAME_VERTEX,
+    RENDER_WIREFRAME,
+    RENDER_FILLED,
+    RENDER_FILLED_WIREFRAME,
+    RENDER_TEXTURED,
+    RENDER_TEXTURED_WIREFRAME
+} render_mode;
+
+extern render_mode current_render_mode;
+
 bool initialize_window(void);
 
 

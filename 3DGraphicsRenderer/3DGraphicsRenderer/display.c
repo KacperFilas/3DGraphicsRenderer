@@ -8,6 +8,9 @@ SDL_Texture* color_buffer_texture = NULL;
 int window_width = 800;
 int window_height = 600;
 
+render_mode current_render_mode = RENDER_FILLED_WIREFRAME;
+
+
 bool initialize_window(void){
     // Initialize SDL
     if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {

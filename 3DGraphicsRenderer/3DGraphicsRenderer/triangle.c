@@ -31,7 +31,6 @@ void fill_flat_bottom_triangle(int x0, int y0, int x1, int y1, int x2, int y2, u
     }
 }
 
-
 void fill_flat_top_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color){
     // Find the two slopes of the traingle 
     float inv_slope1 = (float)(x0 - x2) / (y0 - y2);
@@ -83,6 +82,15 @@ void draw_filled_triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32
 }
 
 
+void draw_textured_triangle (
+    int x0, int y0, float u0, float v0, 
+    int x1, int y1, float u1, float v1, 
+    int x2, int y2, float u2, float v2,
+    uint32_t* texture
+){
+    //TODO
+    draw_triangle(x0, y0, x1, y1, x2, y2, 0xFFFFFFFF);
+}
 
 
    

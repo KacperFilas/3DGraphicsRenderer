@@ -8,6 +8,8 @@
 #include "vector.h"
 #include "mesh.h"
 #include "matrix.h"
+#include "texture.h"
+#include "triangle.h"
 
 
 // Array of triangles to render
@@ -15,17 +17,10 @@ triangle_t* triangles_to_render = NULL;
 
 vec3_t camera_position = { 0, 0, 0 };
 
-enum render_mode {
-    RENDER_WIREFRAME_VERTEX,
-    RENDER_WIREFRAME,
-    RENDER_FILLED,
-    RENDER_FILLED_WIREFRAME,
-} render_mode;
-
-enum render_mode current_render_mode = RENDER_FILLED_WIREFRAME;
 bool back_face_culling = true;
 bool is_running = false;
 int previous_frame_time = 0;
+
 
 matrix4_t proj_matrix;
 
@@ -50,11 +45,15 @@ void setup(void){
     float zfar = 100.0;
     proj_matrix = matrix4_make_perspective(fov, aspect, znear, zfar);
 
+    //Manualy load the hardcorded texture data from the static array
+    mesh_texture = (uint32_t*) REDBRICK_TEXTURE;
+    texture_width = 64;
+    texture_height = 64;
 
     // load_obj_file_data("./Cube.obj");
-    load_obj_file_data("./Something.obj");
+    // load_obj_file_data("./Something.obj");
 
-    // load_cube_mesh_data();
+    load_cube_mesh_data();
 
 }
 
@@ -73,6 +72,8 @@ void process_input(void){
             case SDLK_1: current_render_mode = RENDER_FILLED_WIREFRAME; break;
             case SDLK_2: current_render_mode = RENDER_WIREFRAME; break;
             case SDLK_3: current_render_mode = RENDER_FILLED; break;
+            case SDLK_4: current_render_mode = RENDER_TEXTURED; break;
+            case SDLK_5: current_render_mode = RENDER_TEXTURED_WIREFRAME; break;
             // Back face culling
             case SDLK_c: back_face_culling = !back_face_culling; break;
         }
@@ -109,8 +110,8 @@ void update(void){
     // Update the previous frame time
     previous_frame_time = SDL_GetTicks();
 
-    // mesh.rotation.x += 0.01;
-    // mesh.rotation.y += 0.01;
+    mesh.rotation.x += 0.01;
+    mesh.rotation.y += 0.01;
 
     // mesh.scale.x += 0.002;
     // mesh.scale.y += 0.001;
@@ -231,6 +232,12 @@ void update(void){
                 { projected_points[1].x, projected_points[1].y},
                 { projected_points[2].x, projected_points[2].y}
             },
+            .texcoords = {
+                { mesh_face.a_uv.u, mesh_face.a_uv.v },
+                { mesh_face.b_uv.u, mesh_face.b_uv.v },
+                { mesh_face.c_uv.u, mesh_face.c_uv.v }
+
+            },
                 .color = triangle_color,
                 .avg_depth = avg_depth
         };
@@ -267,7 +274,17 @@ void render(void){
             );
         }
 
-        if (current_render_mode == RENDER_WIREFRAME || current_render_mode == RENDER_FILLED_WIREFRAME){
+        // Draw textured triangle
+        if (current_render_mode == RENDER_TEXTURED || current_render_mode == RENDER_TEXTURED_WIREFRAME){
+            draw_textured_triangle(
+                triangle.points[0].x, triangle.points[0].y, triangle.texcoords[0].u, triangle.texcoords[0].v,   
+                triangle.points[1].x, triangle.points[1].y, triangle.texcoords[1].u, triangle.texcoords[1].v,
+                triangle.points[2].x, triangle.points[2].y, triangle.texcoords[2].u, triangle.texcoords[2].v,
+                triangle.color
+            );
+        }
+
+        if (current_render_mode == RENDER_WIREFRAME || current_render_mode == RENDER_FILLED_WIREFRAME || current_render_mode == RENDER_TEXTURED_WIREFRAME){
 
             draw_triangle(
                 triangle.points[0].x, triangle.points[0].y, 
