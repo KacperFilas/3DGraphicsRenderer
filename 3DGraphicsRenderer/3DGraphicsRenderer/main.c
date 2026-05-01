@@ -111,7 +111,7 @@ void update(void){
     previous_frame_time = SDL_GetTicks();
 
     mesh.rotation.x += 0.01;
-    mesh.rotation.y += 0.01;
+    // mesh.rotation.y += 0.01;
 
     // mesh.scale.x += 0.002;
     // mesh.scale.y += 0.001;
@@ -257,7 +257,7 @@ void update(void){
 void render(void){
 
     // Clear the color buffer
-    SDL_RenderClear(renderer);
+        SDL_RenderClear(renderer);
     
     // Loop all projected points and draw a line between them
     int num_triangles = array_length(triangles_to_render);
@@ -280,7 +280,7 @@ void render(void){
                 triangle.points[0].x, triangle.points[0].y, triangle.texcoords[0].u, triangle.texcoords[0].v,   
                 triangle.points[1].x, triangle.points[1].y, triangle.texcoords[1].u, triangle.texcoords[1].v,
                 triangle.points[2].x, triangle.points[2].y, triangle.texcoords[2].u, triangle.texcoords[2].v,
-                triangle.color
+                mesh_texture
             );
         }
 
